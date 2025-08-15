@@ -579,14 +579,12 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 		const auto iSlot = pWeapon->GetSlot();
 		const auto bRapidFire = pWeapon->IsRapidFire();
 		
-		if (!m_mStorage.contains(iSlot) || pWeapon->GetWeaponID() == TF_WEAPON_PASSTIME_GUN)
-			return;
-			
-		auto& tStorage = m_mStorage[iSlot];
-		if (!tStorage.m_bActive)
+		if (m_iPotentialCrits <= 0)
+    		return;
+		if (!true)
 			return;
 
-		if (tStorage.m_flDamage > 0)
+		if (m_flDamage > 0)
 		{
 			if (pLocal->IsCritBoosted())
 			{
@@ -599,7 +597,9 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 			else if (pWeapon->m_flCritTime() > I::GlobalVars->curtime)
 			{
 				const float flTime = pWeapon->m_flCritTime() - I::GlobalVars->curtime;
-				leftText = std::format("Crits: {} / {}", std::max(0, tStorage.m_iAvailableCrits), tStorage.m_iPotentialCrits);
+				char buf[64];
+				sprintf_s(buf, "Crits: %d / %d", std::max<int>(0, m_iAvailableCrits), m_iPotentialCrits);
+				leftText = buf;
 				rightText = "STREAMING";
 				rightColor = { 100, 255, 255, 255 };
 				barColor = { 100, 255, 255, 255 };
@@ -607,14 +607,19 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 			}
 			else if (!m_bCritBanned || iSlot == SLOT_MELEE)
 			{
-				leftText = std::format("Crits: {} / {}", std::max(0, tStorage.m_iAvailableCrits), tStorage.m_iPotentialCrits);
+				char buf[64];
+				sprintf_s(buf, "Crits: %d / %d", std::max<int>(0, m_iAvailableCrits), m_iPotentialCrits);
+				leftText = buf;
+
 				if (bRapidFire && TICKS_TO_TIME(pLocal->m_nTickBase()) < pWeapon->m_flLastRapidFireCritCheckTime() + 1.f)
 				{
 					const float flTime = pWeapon->m_flLastRapidFireCritCheckTime() + 1.f - TICKS_TO_TIME(pLocal->m_nTickBase());
 					if (flTime > 0.0001f)
 					{
-						rightText = std::format("WAIT {:.2f}s", flTime);
-						rightColor = tStorage.m_iAvailableCrits > 0 ? Color_t{ 40, 200, 40, 255 } : Color_t{ 200, 40, 40, 255 };
+						char bufRight[64];
+						sprintf_s(bufRight, "WAIT %.2f s", flTime);
+						rightText = bufRight;
+						rightColor = m_iAvailableCrits > 0 ? Color_t{ 40, 200, 40, 255 } : Color_t{ 200, 40, 40, 255 };
 						barColor = { 255, 150, 0, 255 }; // Orange for waiting
 					}
 					else
@@ -625,7 +630,7 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 					}
 					targetProgress = flTime;
 				}
-				else if (tStorage.m_iAvailableCrits >= tStorage.m_iPotentialCrits)
+				else if (m_iAvailableCrits >= m_iPotentialCrits)
 				{
 					rightText = "READY";
 					rightColor = { 40, 200, 40, 255 }; // Dark green
@@ -634,9 +639,11 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 				else
 				{
 					float currentBucket = pWeapon->m_flCritTokenBucket();
-					int damageNeeded = static_cast<int>(std::ceil(tStorage.m_flCost - currentBucket));
-					rightText = std::format("DMG: {}", std::max(0, damageNeeded));
-					rightColor = tStorage.m_iAvailableCrits > 0 ? Color_t{ 40, 200, 40, 255 } : Color_t{ 200, 40, 40, 255 };
+					int damageNeeded = static_cast<int>(std::ceil(m_flCost - currentBucket));
+					char bufRight[64];
+					sprintf_s(bufRight, "DMG: %d", std::max(0, damageNeeded));
+					rightText = bufRight;
+					rightColor = m_iAvailableCrits > 0 ? Color_t{ 40, 200, 40, 255 } : Color_t{ 200, 40, 40, 255 };
 					
 					static auto bucketCap = U::ConVars.FindVar("tf_weapon_criticals_bucket_cap");
 					targetProgress = currentBucket / bucketCap->GetFloat();
@@ -644,7 +651,10 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 			}
 			else
 			{
-				leftText = std::format("DMG: {}", static_cast<int>(ceilf(m_flDamageTilFlip)));
+				char bufLeft[64];
+				sprintf_s(bufLeft, "DMG: %d", static_cast<int>(ceilf(m_flDamageTilFlip)));
+				leftText = bufLeft;
+
 				rightText = "BANNED";
 				rightColor = { 200, 40, 40, 255 }; // Dark red
 				barColor = { 200, 40, 40, 255 };
