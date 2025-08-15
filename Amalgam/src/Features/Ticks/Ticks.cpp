@@ -370,23 +370,39 @@ void CTicks::Draw(CTFPlayer* pLocal)
 	{
 		int iChoke = std::max(I::ClientState->chokedcommands - (F::AntiAim.YawOn() ? F::AntiAim.AntiAimTicks() : 0), 0);
 		int iTicks = std::clamp(m_iShiftedTicks + iChoke, 0, m_iMaxShift);
-		float flRatio = float(iTicks) / m_iMaxShift;
-		int iSizeX = H::Draw.Scale(100, Scale_Round), iSizeY = H::Draw.Scale(12, Scale_Round);
-		int iPosX = dtPos.x - iSizeX / 2, iPosY = dtPos.y + fFont.m_nTall + H::Draw.Scale(4) + 1;
 
-		H::Draw.StringOutlined(fFont, dtPos.x, dtPos.y + 2, Vars::Menu::Theme::Active.Value, Vars::Menu::Theme::Background.Value, ALIGN_TOP, std::format("Ticks {} / {}", iTicks, m_iMaxShift).c_str());
-		if (m_iWait)
-			H::Draw.StringOutlined(fFont, dtPos.x, dtPos.y + fFont.m_nTall + H::Draw.Scale(18, Scale_Round) + 1, Vars::Menu::Theme::Active.Value, Vars::Menu::Theme::Background.Value, ALIGN_TOP, "Not Ready");
+		int boxWidth = 180;
+		int boxHeight = 29;
+		int barHeight = 3;
+		int textBoxHeight = boxHeight - barHeight;
 
-		H::Draw.LineRoundRect(iPosX, iPosY, iSizeX, iSizeY, H::Draw.Scale(4, Scale_Round), Vars::Menu::Theme::Accent.Value, 16);
-		if (flRatio)
+		int x = dtPos.x - boxWidth / 2;
+		int y = dtPos.y;
+
+		Color_t bgColor = { 0, 0, 0, 180 };
+		H::Draw.GradientRect(x, y, boxWidth, textBoxHeight, bgColor, bgColor, true);
+		H::Draw.GradientRect(x, y + textBoxHeight, boxWidth, barHeight, bgColor, bgColor, true);
+
+		static float currentProgress = 0.0f;
+		float targetProgress = float(iTicks) / m_iMaxShift;
+		currentProgress = std::lerp(currentProgress, targetProgress, I::GlobalVars->frametime * 10.0f);
+
+		int barWidth = static_cast<int>(boxWidth * currentProgress);
+		if (barWidth > 0)
 		{
-			iSizeX -= H::Draw.Scale(2, Scale_Ceil) * 2, iSizeY -= H::Draw.Scale(2, Scale_Ceil) * 2;
-			iPosX += H::Draw.Scale(2, Scale_Round), iPosY += H::Draw.Scale(2, Scale_Round);
-			H::Draw.StartClipping(iPosX, iPosY, iSizeX * flRatio, iSizeY);
-			H::Draw.FillRoundRect(iPosX, iPosY, iSizeX, iSizeY, H::Draw.Scale(3, Scale_Round), Vars::Menu::Theme::Accent.Value, 16);
-			H::Draw.EndClipping();
+			Color_t barColor = m_iWait ? Color_t{ 255, 150, 0, 255 } : Color_t{ 0, 255, 100, 255 };
+			H::Draw.GradientRect(x, y + textBoxHeight, barWidth, barHeight, barColor, barColor, true);
 		}
+
+		std::string leftText = "Ticks";
+		std::string rightText = std::format("{} / {}", iTicks, m_iMaxShift);
+		Color_t textColor = Vars::Menu::Theme::Active.Value;
+
+		H::Draw.String(fFont, x + 5, y + (textBoxHeight / 2), textColor, ALIGN_LEFT, leftText.c_str());
+		H::Draw.String(fFont, x + boxWidth - 5, y + (textBoxHeight / 2), textColor, ALIGN_RIGHT, rightText.c_str());
+
+		if (m_iWait)
+			H::Draw.StringOutlined(fFont, dtPos.x, y + boxHeight + 2, textColor, Vars::Menu::Theme::Background.Value, ALIGN_TOP, "Not Ready");
 	}
 	else
 		H::Draw.StringOutlined(fFont, dtPos.x, dtPos.y + 2, Vars::Menu::Theme::Active.Value, Vars::Menu::Theme::Background.Value, ALIGN_TOP, std::format("Speedhack x{}", Vars::Speedhack::Amount.Value).c_str());
