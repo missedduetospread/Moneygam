@@ -398,8 +398,8 @@ void CTicks::Draw(CTFPlayer* pLocal)
 		std::string rightText = std::format("{} / {}", iTicks, m_iMaxShift);
 		Color_t textColor = Vars::Menu::Theme::Active.Value;
 
-		H::Draw.String(fFont, x + 5, y + (textBoxHeight / 2), textColor, ALIGN_LEFT, leftText.c_str());
-		H::Draw.String(fFont, x + boxWidth - 5, y + (textBoxHeight / 2), textColor, ALIGN_RIGHT, rightText.c_str());
+		H::Draw.StringOutlined(fFont, x + 5, y + (textBoxHeight / 2), textColor, Vars::Menu::Theme::Background.Value, ALIGN_LEFT, leftText.c_str());
+		H::Draw.StringOutlined(fFont, x + boxWidth - 5, y + (textBoxHeight / 2), textColor, Vars::Menu::Theme::Background.Value, ALIGN_RIGHT, rightText.c_str());
 
 		if (m_iWait)
 			H::Draw.StringOutlined(fFont, dtPos.x, y + boxHeight + 2, textColor, Vars::Menu::Theme::Background.Value, ALIGN_TOP, "Not Ready");
