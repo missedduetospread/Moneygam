@@ -2,8 +2,8 @@
 
 void CFonts::Reload(float flDPI)
 {
-	m_mFonts[FONT_ESP] = { "Verdana", int(12.f * flDPI), FONTFLAG_ANTIALIAS, 0 };
-	m_mFonts[FONT_INDICATORS] = { "Verdana", int(13.f * flDPI), FONTFLAG_ANTIALIAS, 0 };
+	m_mFonts[FONT_ESP] = { "Tahoma", int(11.f * flDPI), FONTFLAG_NONE, 800 };
+    m_mFonts[FONT_INDICATORS] = { "Tahoma", int(11.f * flDPI), FONTFLAG_NONE, 800 };
 
 	for (auto& [_, fFont] : m_mFonts)
 	{
