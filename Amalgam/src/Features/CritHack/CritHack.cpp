@@ -673,10 +673,10 @@ void CCritHack::Draw(CTFPlayer* pLocal)
 	if (barWidth > 0)
 		H::Draw.GradientRect(x, y + textBoxHeight, barWidth, barHeight, barColor, barColor, true);
 
-	H::Draw.String(fFont, x + 5, y + (textBoxHeight / 2), leftColor, ALIGN_LEFT, leftText.c_str());
+	H::Draw.StringOutlined(fFont, x + 5, y + (textBoxHeight / 2), leftColor, Vars::Menu::Theme::Background.Value, ALIGN_LEFT, leftText.c_str());
 	if (!rightText.empty())
-		H::Draw.String(fFont, x + boxWidth - 5, y + (textBoxHeight / 2), rightColor, ALIGN_RIGHT, rightText.c_str());
+		H::Draw.StringOutlined(fFont, x + boxWidth - 5, y + (textBoxHeight / 2), rightColor, Vars::Menu::Theme::Background.Value, ALIGN_RIGHT, rightText.c_str());
 	
 	if (Vars::Misc::Game::AntiCheatCompatibility.Value)
-		H::Draw.String(fFont, x + boxWidth / 2, y - fFont.m_nTall - 2, Vars::Colors::IndicatorTextBad.Value, ALIGN_CENTER, "Anti-cheat compatibility");
+		H::Draw.StringOutlined(fFont, x + boxWidth / 2, y - fFont.m_nTall - 2, Vars::Colors::IndicatorTextBad.Value, Vars::Menu::Theme::Background.Value, ALIGN_CENTER, "Anti-cheat compatibility");
 }
